@@ -4,13 +4,9 @@ title: About
 permalink: /about/
 ---
 
-
-Loading
+Soon!
 
 ### More Information
 
-Soon
+Loading!!
 
-### Contact me
-
-[harshithasridhar172000@gmail.com](mailto:harshithasridhar172000@gmail.com)
