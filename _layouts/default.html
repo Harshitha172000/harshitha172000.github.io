@@ -14,16 +14,16 @@
 	        		<li><a href="/blog">Blog</a></li>
 	    		</ul>
 			</nav>
-			<div class="container">
-			
-			{{ content }}
-			
-			</div><!-- /.container -->
-			<footer>
-	    		<ul>
-	        		<li><a href="mailto:harshithasridhar172000@gmail.com">email</a></li>
-	        		<li><a href="https://github.com/Harshitha172000">github.com/Harshitha172000</a></li>
-				</ul>
-			</footer>
+			 <div id="main" role="main" class="container">
+                       {{ content }}
+                       </div>
+
+                        <div class="wrapper-footer">
+                            <div class="container">
+                                  <footer class="footer">
+                                  {% include svg-icons.html %}
+                                 </footer>
+                            </div>
+                        </div>
 		</body>
 	</html>
