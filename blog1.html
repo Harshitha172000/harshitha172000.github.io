@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Harshitha's Blog</title>
+	<link rel="stylesheet" href="fontawesome/css/all.min.css"> <!-- https://fontawesome.com/ -->
+	<!--<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">  https://fonts.google.com/ -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/templatemo-xtra-blog.css" rel="stylesheet">
+<!--
+    
+TemplateMo 553 Xtra Blog
+
+https://templatemo.com/tm-553-xtra-blog
+
+-->
+</head>
+<body>
+	<header class="tm-header" id="tm-header">
+        <div class="tm-header-wrapper">
+            <button class="navbar-toggler" type="button" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="tm-site-header">
+                
+                <h1 class="text-center">Harshitha's Blog</h1>
+            </div>
+            <nav class="tm-nav" id="tm-nav">            
+                <ul>
+                    <li class="tm-nav-item"><a href="index.html" class="tm-nav-link">
+                        <i class="fas fa-home"></i>
+                        Home
+                    </a></li>
+                    <!--<li class="tm-nav-item active"><a href="post.html" class="tm-nav-link">
+                        <i class="fas fa-pen"></i>
+                        Posts
+                    </a></li>-->
+                    <li class="tm-nav-item"><a href="about.html" class="tm-nav-link">
+                        <i class="fas fa-users"></i>
+                        About Me
+                    </a></li>
+                    <!--<li class="tm-nav-item"><a href="contact.html" class="tm-nav-link">
+                        <i class="far fa-comments"></i>
+                        Contact 
+                    </a></li>-->
+                </ul>
+            </nav>
+            <div class="tm-mb-65">
+                <a rel="nofollow" href="https://instagram.com/___harshi_tha_" class="tm-social-link">
+                    <i class="fab fa-instagram tm-social-icon"></i>
+                </a>
+                <a href="https://twitter.com/Harshit49678822" class="tm-social-link">
+                    <i class="fab fa-twitter tm-social-icon"></i>
+                </a>
+                <a href="https://github.com/Harshitha172000" class="tm-social-link">
+                    <i class="fab fa-github tm-social-icon"></i>
+                </a>
+                <a href="https://linkedin.com/in/harshitha-s-" class="tm-social-link">
+                    <i class="fab fa-linkedin tm-social-icon"></i>
+                </a>
+            </div>
+            <p class="tm-mb-80 pr-5 text-white">
+                Hi there! I am Harshitha.
+            </p>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <main class="tm-main">
+            <!-- Search form 
+            <div class="row tm-row">
+                <div class="col-12">
+                    <form method="GET" class="form-inline tm-mb-80 tm-search-form">                
+                        <input class="form-control tm-search-input" name="query" type="text" placeholder="Search..." aria-label="Search">
+                        <button class="tm-search-button" type="submit">
+                            <i class="fas fa-search tm-search-icon" aria-hidden="true"></i>
+                        </button>                                
+                    </form>
+                </div>                
+            </div> -->   
+                             
+
+            <div class="row tm-row tm-mb-40">
+                <div class="col-12">                                                       
+                        <div class="mb-4">
+                            <h2 class="pt-2 tm-mb-40 tm-color-primary tm-post-title"> Getting started with Mor1kx formal </h2>                       
+                            
+                            
+<p>This summer, I have got an opportunity to work with the FOSSi organization as part of Google Summer Code, Student Developer 2021. I will be working on a project <strong>Formal Verification of OpenRISC&#39;s mor1kx processor using Yosys</strong>.  I will be working on this project under the guidance of mentors Stafford Horne and Stefan Wallentowitz. I am very much impressed by the idea of formal verification whose outcomes are very much promising in identifying the bugs early in the design cycle. Not just that, it has other benefits too! It’s faster, reliable, and exhaustive.  </p>
+<p>No doubt, formal verification has attained popularity in the last few years. And the recent advancements in the formal tools drag designer’s attention to identify the design errors which might occur later in the design cycle. Why not detect errors early and fix them? This is what formal verification does, landing at the safer side of the design. Identifying bugs sooner in the design, thus making it easier to fix. If not, any failures in the later phase of the design might result in financial loss and physical damage. </p>
+<p>As I will be closely working with the Mor1kx processor, it is necessary to understand its architecture. It’s not just a more sophisticated processor but also a highly configurable one. You can reconfigure any of its pipelines: Cappuccino, Espresso, Pronto Espresso. Adding to this, it also has atomic operations and multicore features.</p>
+<p><em>My approach to Mor1kx formal</em> </p>
+<p>Formal verification looks from the output aspect of the design. Here, we are not concerned about any stimulus, or test benches, or any timing paths, and to be exact not even concerned about the design’s functionality. The main focus is on the specifications of the design, and the task is to ensure that the design meets its specifications. The entire state space of the design will be explored, formal tools check if by any means the design enters into an erroneous state. </p>
+<p>Getting started with mor1kx formal by referring to the ISA reference manual (spec), formalizing it, and turning that into a mathematical characterization of correctness to show that the processor behaves the same way as its ISA spec. Inside a processor, there are many blocks and sub-blocks, where do I start from? The answer is pretty simple, starting with any small module and extending to the top module would be a good method. That’s what I will be following in my project. Firstly, I will prove the small pieces of the processor and then hierarchically move towards the entire processor. I have divided the work into four verification stages for simplicity and my project flow for formal verification is depicted in the below image.</p>
+
+<p><img src="img/capp.png" alt="Image" class="img-fluid"></p>
+<p>This is a formal verification plan for the cappuccino pipeline. Here, I have included the main modules but there are several sub-modules within it that are hidden. Beginning with the Fetch block, the attempt is to individually prove the correctness of instruction cache, dpram, and instruction memory management unit modules. After that integrating proved modules and then finally the Fetch block will be formally verified. Next, the same procedure will be followed for decode, execution, and memory blocks. Like the Fetch block, individually ALU, control unit, data caches, and other modules verification will be done.  In the end, all the proved verification blocks are integrated to verify cappuccino mor1kx as a whole. Yosys formal tools will be used for mor1kx formal verification as it supports several mathematical models like smtbmc, prove, k-induction, etc. This is my approach for mor1kx formal verification where my primary goal is to detect the common design errors and ambiguities in the design. Hence, making it more reliable.</p>
+<p>What&#39;s the stability of mor1kx? Is it bug-free? By the end of this project, any doubts pertaining to its stability will be answered with formal proofs. Formal verification is a powerful tool for analyzing the lifespan of a chip. In fact, we can increase chip/design lifetime by correcting its failures and thus making it error-free. Outcomes of this project might draw the attention of designers who haven’t chosen mor1kx due to its unknown stability. </p>
+
+
+
+
+                               
+                               
+
+                           <!-- <span class="d-block text-right tm-color-primary">Creative . Design . Business</span>-->
+                        </div>
+                    </div>                    
+                </div>
+            
+                        
+                        <!-- Comments 
+                        <div>
+                            <h2 class="tm-color-primary tm-post-title">Comments</h2>
+                            <hr class="tm-hr-primary tm-mb-45">
+                           
+                            <form action="" class="mb-5 tm-comment-form">
+                                <h2 class="tm-color-primary tm-post-title mb-4">Your comment</h2>
+                                <div class="mb-4">
+                                    <input class="form-control" name="name" type="text">
+                                </div>
+                                <div class="mb-4">
+                                    <input class="form-control" name="email" type="text">
+                                </div>
+                                <div class="mb-4">
+                                    <textarea class="form-control" name="message" rows="6"></textarea>
+                                </div>
+                                <div class="text-right">
+                                    <button class="tm-btn tm-btn-primary tm-btn-small">Submit</button>                        
+                                </div>                                
+                            </form>                          
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+                <!--<aside class="col-lg-4 tm-aside-col">
+                    <div class="tm-post-sidebar">
+                        <hr class="mb-3 tm-hr-primary">
+                        <h2 class="mb-4 tm-post-title tm-color-primary">Categories</h2>
+                        <ul class="tm-mb-75 pl-5 tm-category-list">
+                            <li><a href="#" class="tm-color-primary">Visual Designs</a></li>
+                            <li><a href="#" class="tm-color-primary">Travel Events</a></li>
+                            <li><a href="#" class="tm-color-primary">Web Development</a></li>
+                            <li><a href="#" class="tm-color-primary">Video and Audio</a></li>
+                            <li><a href="#" class="tm-color-primary">Etiam auctor ac arcu</a></li>
+                            <li><a href="#" class="tm-color-primary">Sed im justo diam</a></li>
+                        </ul>
+                        <hr class="mb-3 tm-hr-primary">
+                        <h2 class="tm-mb-40 tm-post-title tm-color-primary">Related Posts</h2>
+                        <a href="#" class="d-block tm-mb-40">
+                            <figure>
+                                <img src="img/capp.png" alt="Image" class="mb-3 img-fluid">
+                                <figcaption class="tm-color-primary">Duis mollis diam nec ex viverra scelerisque a sit</figcaption>
+                            </figure>
+                        </a>
+                        <a href="#" class="d-block tm-mb-40">
+                            <figure>
+                                <img src="img/img-05.jpg" alt="Image" class="mb-3 img-fluid">
+                                <figcaption class="tm-color-primary">Integer quis lectus eget justo ullamcorper ullamcorper</figcaption>
+                            </figure>
+                        </a>
+                        <a href="#" class="d-block tm-mb-40">
+                            <figure>
+                                <img src="img/img-06.jpg" alt="Image" class="mb-3 img-fluid">
+                                <figcaption class="tm-color-primary">Nam lobortis nunc sed faucibus commodo</figcaption>
+                            </figure>
+                        </a>
+                    </div>                    
+                </aside>-->
+            <!--</div>
+            <footer class="row tm-row">
+                <div class="col-md-6 col-12 tm-color-gray">
+                    Design: <a rel="nofollow" target="_parent" href="https://templatemo.com" class="tm-external-link">TemplateMo</a>
+                </div>
+                <div class="col-md-6 col-12 tm-color-gray tm-copyright">
+                    Copyright 2020 Xtra Blog Company Co. Ltd.
+                </div>
+            </footer> -->
+        </main>
+    </div>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/templatemo-script.js"></script>
+</body>
+</html>
