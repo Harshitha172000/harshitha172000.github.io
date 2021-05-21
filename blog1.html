@@ -47,8 +47,8 @@ https://templatemo.com/tm-553-xtra-blog
                 </ul>
             </nav>
             <div class="tm-mb-65">
-                <a rel="nofollow" href="https://instagram.com/___harshi_tha_" class="tm-social-link">
-                    <i class="fab fa-instagram tm-social-icon"></i>
+                <a rel="nofollow" href="mailto:harshithasridhar172000@gmail.com" class="tm-social-link">
+                    <i class="fa fa-envelope tm-social-icon"></i>
                 </a>
                 <a href="https://twitter.com/Harshit49678822" class="tm-social-link">
                     <i class="fab fa-twitter tm-social-icon"></i>
@@ -84,26 +84,31 @@ https://templatemo.com/tm-553-xtra-blog
                 <div class="col-12">                                                       
                         <div class="mb-4">
                             <h2 class="pt-2 tm-mb-40 tm-color-primary tm-post-title"> Getting started with Mor1kx formal </h2>                       
+                            <p class="tm-mb-40">May 21, 2021 </p>
                             
-                            
-<p>This summer, I have got an opportunity to work with the FOSSi organization as part of Google Summer Code, Student Developer 2021. I will be working on a project <strong>Formal Verification of OpenRISC&#39;s mor1kx processor using Yosys</strong>.  I will be working on this project under the guidance of mentors Stafford Horne and Stefan Wallentowitz. I am very much impressed by the idea of formal verification whose outcomes are very much promising in identifying the bugs early in the design cycle. Not just that, it has other benefits too! It’s faster, reliable, and exhaustive.  </p>
-<p>No doubt, formal verification has attained popularity in the last few years. And the recent advancements in the formal tools drag designer’s attention to identify the design errors which might occur later in the design cycle. Why not detect errors early and fix them? This is what formal verification does, landing at the safer side of the design. Identifying bugs sooner in the design, thus making it easier to fix. If not, any failures in the later phase of the design might result in financial loss and physical damage. </p>
-<p>As I will be closely working with the Mor1kx processor, it is necessary to understand its architecture. It’s not just a more sophisticated processor but also a highly configurable one. You can reconfigure any of its pipelines: Cappuccino, Espresso, Pronto Espresso. Adding to this, it also has atomic operations and multicore features.</p>
-<p><em>My approach to Mor1kx formal</em> </p>
-<p>Formal verification looks from the output aspect of the design. Here, we are not concerned about any stimulus, or test benches, or any timing paths, and to be exact not even concerned about the design’s functionality. The main focus is on the specifications of the design, and the task is to ensure that the design meets its specifications. The entire state space of the design will be explored, formal tools check if by any means the design enters into an erroneous state. </p>
-<p>Getting started with mor1kx formal by referring to the ISA reference manual (spec), formalizing it, and turning that into a mathematical characterization of correctness to show that the processor behaves the same way as its ISA spec. Inside a processor, there are many blocks and sub-blocks, where do I start from? The answer is pretty simple, starting with any small module and extending to the top module would be a good method. That’s what I will be following in my project. Firstly, I will prove the small pieces of the processor and then hierarchically move towards the entire processor. I have divided the work into four verification stages for simplicity and my project flow for formal verification is depicted in the below image.</p>
-
+<p><span data-preserver-spaces="true">This summer, I have got an opportunity to work with the FOSSi organization as part of Google Summer Code, Student Developer 2021. I will be working on a project&nbsp;</span><strong><span data-preserver-spaces="true">Formal Verification of OpenRISC's mor1kx processor using Yosys</span></strong><span data-preserver-spaces="true">. I will be working on this project under the guidance of mentors Stafford Horne and Stefan Wallentowitz. I am very much impressed by the idea of formal verification whose outcomes are very much promising in identifying the bugs early in the design cycle. Not just that, it has other benefits too! It&rsquo;s faster, reliable, and exhaustive.</span></p>
+<p>&nbsp;</p>
+<p><span data-preserver-spaces="true">No doubt, formal verification has attained popularity in the last few years. And the recent advancements with formal tools drag designer&rsquo;s attention to identify the design errors which might occur later in the design cycle. Why not detect errors early and fix them? This is what formal verification does, landing at the safer side of the design. Identifying bugs sooner in the design, thus making it easier to fix. If not, any failures in the later phase of the design might result in financial loss and physical damage.</span></p>
+<p>&nbsp;</p>
+<p><span data-preserver-spaces="true">As I will be closely working with the Mor1kx processor, it is necessary to understand its architecture. It&rsquo;s not just a more sophisticated processor but also a highly configurable one. You can reconfigure any of its pipelines: Cappuccino, Espresso, Pronto Espresso. Adding to this, it also has atomic operations and multicore features.</span></p>
+<p>&nbsp;</p>
+<h2><strong><em><span data-preserver-spaces="true">My approach to Mor1kx formal</span></em></strong></h2>
+<p>&nbsp;</p>
+<p><span data-preserver-spaces="true">Formal verification looks from the output aspect of the design. Here, we are not concerned about any stimulus, or test benches, or any timing paths, and to be exact not even concerned about the design&rsquo;s functionality. The main focus is on the specifications of the design, and the task is to ensure that the design meets its specifications. The entire state space of the design will be explored, formal tools check if by any means the design enters into an erroneous state.</span></p>
+<p>&nbsp;</p>
+<p><span data-preserver-spaces="true">Getting started with mor1kx formal by referring to the ISA reference manual (spec), formalizing it, and turning that into a mathematical characterization of correctness to show that the processor behaves the same way as its ISA spec. Inside a processor, there are many blocks and sub-blocks, where do I start from? The answer is pretty simple, starting with any small module and extending to the top module would be a good method. That&rsquo;s what I will be following in my project. Firstly, I will prove the small pieces of the processor and then hierarchically move towards the entire processor. I have divided the work into four verification stages for simplicity and my project flow for formal verification is depicted in the below image.</span></p>
+<p>&nbsp;</p>
+<p><span data-preserver-spaces="true">This is a formal verification plan for the cappuccino pipeline. Here, I have included the main modules but several sub-modules within it are hidden. Beginning with the Fetch block, the attempt is to individually prove the correctness of instruction cache, dpram, and instruction memory management unit modules. After that integrating proved modules and then finally the Fetch block will be formally verified. Next, the same procedure will be followed for decode, execution, and memory blocks. Like the Fetch block, individually ALU, control unit, data caches, and other modules verification will be done. In the end, all the proved verification blocks are integrated to verify cappuccino mor1kx as a whole. Yosys formal tools will be used for mor1kx formal verification as it supports several mathematical models like smtbmc, prove, k-induction, etc. This is my approach for mor1kx formal verification where my primary goal is to detect the common design errors and ambiguities in the design. Hence, making it more reliable.</span></p>
+<p>&nbsp;</p>
 <p><img src="img/capp.png" alt="Image" class="img-fluid"></p>
-<p>This is a formal verification plan for the cappuccino pipeline. Here, I have included the main modules but there are several sub-modules within it that are hidden. Beginning with the Fetch block, the attempt is to individually prove the correctness of instruction cache, dpram, and instruction memory management unit modules. After that integrating proved modules and then finally the Fetch block will be formally verified. Next, the same procedure will be followed for decode, execution, and memory blocks. Like the Fetch block, individually ALU, control unit, data caches, and other modules verification will be done.  In the end, all the proved verification blocks are integrated to verify cappuccino mor1kx as a whole. Yosys formal tools will be used for mor1kx formal verification as it supports several mathematical models like smtbmc, prove, k-induction, etc. This is my approach for mor1kx formal verification where my primary goal is to detect the common design errors and ambiguities in the design. Hence, making it more reliable.</p>
-<p>What&#39;s the stability of mor1kx? Is it bug-free? By the end of this project, any doubts pertaining to its stability will be answered with formal proofs. Formal verification is a powerful tool for analyzing the lifespan of a chip. In fact, we can increase chip/design lifetime by correcting its failures and thus making it error-free. Outcomes of this project might draw the attention of designers who haven’t chosen mor1kx due to its unknown stability. </p>
+<p><span data-preserver-spaces="true">What's the stability of mor1kx? Is it bug-free? By the end of this project, any doubts about its stability will be answered with formal proofs. Formal verification is a powerful tool for analyzing the lifespan of a chip. We can increase chip/design lifetime by correcting its failures and thus making it error-free. Outcomes of this project might draw the attention of designers who haven&rsquo;t chosen mor1kx due to its unknown stability. Stay tuned! for further updates on Mor1kx formal.</span></p>
+
 
 
 
 
                                
-                               
-
-                           <!-- <span class="d-block text-right tm-color-primary">Creative . Design . Business</span>-->
+                             <!-- <span class="d-block text-right tm-color-primary">Creative . Design . Business</span>-->
                         </div>
                     </div>                    
                 </div>
@@ -167,15 +172,17 @@ https://templatemo.com/tm-553-xtra-blog
                         </a>
                     </div>                    
                 </aside>-->
-            <!--</div>
+            </div>
             <footer class="row tm-row">
-                <div class="col-md-6 col-12 tm-color-gray">
+               
+              <!--  <div class="col-md-6 col-12 tm-color-gray">
+                    
                     Design: <a rel="nofollow" target="_parent" href="https://templatemo.com" class="tm-external-link">TemplateMo</a>
-                </div>
-                <div class="col-md-6 col-12 tm-color-gray tm-copyright">
+                </div>-->
+                <!--  <div class="col-md-6 col-12 tm-color-gray tm-copyright">
                     Copyright 2020 Xtra Blog Company Co. Ltd.
-                </div>
-            </footer> -->
+                </div>-->
+            </footer> 
         </main>
     </div>
     <script src="js/jquery.min.js"></script>
