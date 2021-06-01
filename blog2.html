@@ -87,14 +87,14 @@ https://templatemo.com/tm-553-xtra-blog
                             <p class="tm-mb-40">June 1, 2021 </p>
 <p>I am delighted to work with the OpenRISC community as part of the FOSSi Foundation as I will contribute to the Mor1kx CPU in its formal verification. I had outlined the tasks of verification stages and my project flow for formal verification, which I have planned to complete in my previous blog.  In this blog, I will elaborate on different formal methods that I could use in my project, and a sneak peek of my work.</p>
 <p>This project is entirely dependent on Yosys tools, specifically SymbiYosys and Yosys-smtbmc. What does Yosys-smtbmc do? It applies formal methods to our code and mathematically proves that code works. If not, the solvers tell us where the code might fail. </p>
-<h1 id="bmc-and-induction">BMC and Induction</h1>
+<h2 id="bmc-and-induction">BMC and Induction</h2>
 <p>Before getting into the tool, it&#39;s essential to understand some terminologies like Bounded Model Check (BMC) and Induction. BMC is the first step in Yosys-smtbmc theorem solving. Here, the solver starts with the initial state of the design and explores all the other states that it can encounter during its transitions. This method is bounded because it is time-limited and checks only a finite number of transitions. </p>
 <p>To find out additional states, we follow the Induction step. It&#39;s just like mathematical Induction, where we first consider base case n=1 and prove that. Later, we check for n states and finally n+1. BMC is like a base case for k-induction. </p>
-<h1 id="formal-declarations">Formal Declarations</h1>
+<h2 id="formal-declarations">Formal Declarations</h2>
 <p>For any formal verification, basic operations like assert, assume, restrict and cover play a vital role. I feel assert() and assume() are far more helpful. For a design, we need to assert some conditions to check if that holds for the design. If the design fails, it may be because the code fails or a flaw in the assertion. It is recommended to assert statements carefully.</p>
 <p>To formally verify, do I need to understand the code? Definitely yes! Without knowing the code and its design states, it&#39;s impossible to assert conditions. Having an excellent exposure to design and its environment would help declare assertions quickly. We can also add constraints to the design space by including assume statements in the code.  </p>
 <p>With this basic idea, it&#39;s good to move ahead with Yosys formal. I have started my project earlier and have verified tiny modules like simple DPRAM, true DPRAM, and the least recently used cache. These modules are part of the instruction cache and instruction memory management unit.</p>
-<h1 id="formally-verifying-dual-port-ram-dpram-mor1kx">Formally Verifying Dual-Port RAM (DPRAM) - Mor1kx</h1>
+<h2 id="formally-verifying-dual-port-ram-dpram-mor1kx">Formally Verifying Dual-Port RAM (DPRAM) - Mor1kx</h2>
 <p>Mor1kx cache memory uses DPRAM to store its contents. The instruction cache is simple DPRAM based, and the instruction memory management unit is true DPRAM based. To check DPRAM&#39;s exactness, I have listed few properties:</p>
 <ol>
 <p>1. On a read operation, data stored at the <em>raddr</em> address in memory should be put on the output data port.</p>
@@ -108,7 +108,7 @@ end
 <p>Asserting these properties is very simple. For reading, assume some random data at the read address in the memory, and then check if the data readout of the DPRAM is the same as the data that you have assumed. If you don&#39;t want to consider some random data, don&#39;t worry yosys does it for you. You need to create a free variable like <em> anyseq</em> or <em>anyconst </em> which generates some random constant or sequence. I am not using free variables because this creates additional registers and wires during synthesis.  </p>
 <p>For a write operation, a similar procedure can be followed. Assume some random write data <em>w_data</em>. Then verify if the same data is written at the write address waddr. If you don&#39;t assume, and just check if w_data==mem[waddr], then also it&#39;s the correct way of asserting as yosys assumes some data. </p>
 <p>Verifying one address location is enough to verify the entire memory space formally. Along with these main assertions, I have checked for other conditions which are design specific. </p>
-<h1 id="formally-verifying-lru-cache-mor1kx">Formally Verifying LRU Cache - Mor1kx</h1>
+<h2 id="formally-verifying-lru-cache-mor1kx">Formally Verifying LRU Cache - Mor1kx</h2>
 <p>Having verified DPRAM, I moved onto the least recently used cache module. I first understood what algorithms exactly do, and asserted properties to verify. These are some properties which I have checked:</p>
 <ol>
 <p>1. Mor1kx implementation supports set associative cache. So, the LRU algorithm holds if there are at least two ways in the set.</p>
