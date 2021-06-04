@@ -170,6 +170,19 @@ https://templatemo.com/tm-553-xtra-blog
 <br><h4 id="lru-algorithm">LRU algorithm</h4>
 <p>Having verified DPRAM, I moved onto the <a href="https://github.com/Harshitha172000/mor1kx/blob/formal/rtl/verilog/mor1kx_cache_lru.v">least recently used algorithm</a> which is used to replace the least recently used a block from cache. This is a fully combinational design module so it&#39;s much easier to verify. </p>
 <p>First, I assumed that inputs to variable access are one-hot encoded just to avoid random inputs that solvers might consider. Since this is an algorithm, I tried to verify its outcomes and asserted if the <code>lru_pre</code> (before access) and <code>lru_post</code> (after access) are also one-hot encoded.</p>
+<pre style="background-color:darkgrey"><code><span class="hljs-comment">/*-----Formal Checking-------*/</span>
+<span class="hljs-meta">`<span class="hljs-meta-keyword">ifdef</span> FORMAL</span>
+   <span class="hljs-keyword">always</span> @(*) <span class="hljs-keyword">begin</span>
+      <span class="hljs-keyword">assert</span> (NUMWAYS &gt; <span class="hljs-number">1</span>);
+      <span class="hljs-keyword">assume</span> (<span class="hljs-built_in">$onehot0</span>(access));
+      <span class="hljs-keyword">assert</span> (<span class="hljs-built_in">$onehot</span>(lru_pre));
+      <span class="hljs-keyword">assert</span> (<span class="hljs-built_in">$onehot</span>(lru_post));
+      <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; NUMWAYS; i = i + <span class="hljs-number">1</span>) <span class="hljs-keyword">begin</span>
+         <span class="hljs-keyword">assert</span> (<span class="hljs-built_in">$size</span>(expand[i]) == NUMWAYS );
+      <span class="hljs-keyword">end</span>
+   <span class="hljs-keyword">end</span>
+<span class="hljs-meta">`<span class="hljs-meta-keyword">endif</span></span>
+</code></pre>
 <p>After adding formal declarations to the source file, the very next step is to <a href="https://symbiyosys.readthedocs.io/en/latest/reference.html">configure the SBY file</a>.
 Under options, the mode of testing has to be specified along with the depth of iterations. Yosys supports solvers like z3, yices, boolector, etc for the smtbmc engine. If not specified, then the smtbmc engine picks any of the above solvers. One last step is to add design files and script specifying the top module. On running the SBY file, one would get to know what&#39;s the result of verification.</p>
 <pre style="background-color:darkgrey"><code>[<span class="hljs-keyword">options</span>]
