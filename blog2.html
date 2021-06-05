@@ -111,14 +111,14 @@ I need to verify a few properties based on its code.</p>
            assert (<span class="hljs-name">mem</span>[address] == <span class="hljs-number">32</span>'d0)<span class="hljs-comment">;</span>
 </code></pre><p>The above assertion checks for the first property which is straightforward.</p>
 <p>For the second property, I have added all necessary conditions which trigger the bypass state and asserted its expected outcome. I have used <code>f_past_valid</code> to keep track of <code>$past()</code>.</p>
-<pre style="background-color:silver"><code>if ($past(<span class="hljs-name">we</span>) &amp; $past(<span class="hljs-name">re</span>) &amp; ($past(<span class="hljs-name">waddr</span>) == $past(<span class="hljs-name">raddr</span>)) &amp; <span class="hljs-name">ENABLE_BYPASS</span> &amp; <span class="hljs-name">f_past_valid</span>)
+<pre style="background-color:silver"><code>if ($past(<span class="hljs-name">we</span>) &amp; $past(<span class="hljs-name">re</span>) &amp; ($past(<span class="hljs-name">waddr</span>) == $past(<span class="hljs-name">raddr</span>)) &amp; <span class="hljs-name"><span class="hljs-name">ENABLE_BYPASS</span></span> &amp; <span class="hljs-name"><span class="hljs-name">f_past_valid</span></span>)
         assert (<span class="hljs-name">dout</span> == $past(<span class="hljs-name">din</span>))<span class="hljs-comment">;</span>
 </code></pre><p>The third property covers the rest of the cases other than <code>ENABLE_BYPASS</code>  and <code>CLEAR_ON_INIT</code>. 
 It checks for the normal read and writes operation of dpram. On read, data requested is put on the output data port in the next clock cycle. Similarly, data written into memory can be observed after one clock cycle.</p>
-<pre style="background-color:silver"><code>      if ($past(<span class="hljs-name">we</span>) &amp; f_past_valid)
+<pre style="background-color:silver"><code>      if ($past(<span class="hljs-name">we</span>) &amp; <span class="hljs-name">f_past_valid</span>)
         assert (<span class="hljs-name">mem</span>[$past(<span class="hljs-name">waddr</span>)] == $past(<span class="hljs-name">din</span>))<span class="hljs-comment">;</span>
 
-      if ($past(<span class="hljs-name">re</span>) &amp; f_past_valid &amp; !ENABLE_BYPASS)
+      if ($past(<span class="hljs-name">re</span>) &amp; <span class="hljs-name">f_past_valid</span> &amp; !<span class="hljs-name">ENABLE_BYPASS</span>)
         assert (<span class="hljs-name">dout</span> == $past(<span class="hljs-name">mem</span>[raddr]))<span class="hljs-comment">;</span>
 </code></pre><p>Here, is the complete formal section of simple dpram.</p>
 <pre style="background-color:silver"><code><span class="hljs-comment">/*-----Formal checking------*/</span>
