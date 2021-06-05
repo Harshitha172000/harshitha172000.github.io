@@ -11,7 +11,8 @@ body {
     overflow-x: hidden;
 }
 
-p, span { color:darkslategrey; }
+p { color:black; }
+span { color:darkblue;}
 hr { 
     border-top-color: black; 
     margin-top: 10px;

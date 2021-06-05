@@ -106,22 +106,22 @@ I need to verify a few properties based on its code.</p>
 </ol>
 
 
-<pre style="background-color:darkgrey"><code> if (<span class="hljs-name">CLEAR_ON_INIT</span>) begin
-        for (<span class="hljs-name">address</span> = <span class="hljs-number">0</span><span class="hljs-comment">; address &lt; (1&lt;&lt;ADDR_WIDTH); address = address + 1) </span>
+<pre style="background-color:silver"><code> if (<span class="hljs-name">CLEAR_ON_INIT</span>) begin
+        for <span class="hljs-name">(address =</span> <span class="hljs-number">0</span><span class="hljs-comment">; address &lt; (1&lt;&lt;ADDR_WIDTH); address = address + 1) </span>
            assert (<span class="hljs-name">mem</span>[address] == <span class="hljs-number">32</span>'d0)<span class="hljs-comment">;</span>
 </code></pre><p>The above assertion checks for the first property which is straightforward.</p>
 <p>For the second property, I have added all necessary conditions which trigger the bypass state and asserted its expected outcome. I have used <code>f_past_valid</code> to keep track of <code>$past()</code>.</p>
-<pre style="background-color:darkgrey"><code>if ($past(<span class="hljs-name">we</span>) &amp; $past(<span class="hljs-name">re</span>) &amp; ($past(<span class="hljs-name">waddr</span>) == $past(<span class="hljs-name">raddr</span>)) &amp; ENABLE_BYPASS &amp; f_past_valid)
+<pre style="background-color:silver"><code>if ($past(<span class="hljs-name">we</span>) &amp; $past(<span class="hljs-name">re</span>) &amp; ($past(<span class="hljs-name">waddr</span>) == $past(<span class="hljs-name">raddr</span>)) &amp; <span class="hljs-name">ENABLE_BYPASS</span> &amp; <span class="hljs-name">f_past_valid</span>)
         assert (<span class="hljs-name">dout</span> == $past(<span class="hljs-name">din</span>))<span class="hljs-comment">;</span>
 </code></pre><p>The third property covers the rest of the cases other than <code>ENABLE_BYPASS</code>  and <code>CLEAR_ON_INIT</code>. 
 It checks for the normal read and writes operation of dpram. On read, data requested is put on the output data port in the next clock cycle. Similarly, data written into memory can be observed after one clock cycle.</p>
-<pre style="background-color:darkgrey"><code>      if ($past(<span class="hljs-name">we</span>) &amp; f_past_valid)
+<pre style="background-color:silver"><code>      if ($past(<span class="hljs-name">we</span>) &amp; f_past_valid)
         assert (<span class="hljs-name">mem</span>[$past(<span class="hljs-name">waddr</span>)] == $past(<span class="hljs-name">din</span>))<span class="hljs-comment">;</span>
 
       if ($past(<span class="hljs-name">re</span>) &amp; f_past_valid &amp; !ENABLE_BYPASS)
         assert (<span class="hljs-name">dout</span> == $past(<span class="hljs-name">mem</span>[raddr]))<span class="hljs-comment">;</span>
 </code></pre><p>Here, is the complete formal section of simple dpram.</p>
-<pre style="background-color:darkgrey"><code><span class="hljs-comment">/*-----Formal checking------*/</span>
+<pre style="background-color:silver"><code><span class="hljs-comment">/*-----Formal checking------*/</span>
 <span class="hljs-meta">`<span class="hljs-meta-keyword">ifdef</span> FORMAL</span>
    <span class="hljs-keyword">reg</span> f_past_valid;
    <span class="hljs-keyword">reg</span> [<span class="hljs-number">31</span>:<span class="hljs-number">0</span>] address;
@@ -146,7 +146,7 @@ It checks for the normal read and writes operation of dpram. On read, data reque
 <br>
 <p>After adding formal declarations to the source file, the very next step is to <a href="https://symbiyosys.readthedocs.io/en/latest/reference.html">configure the SBY file</a>.
 Different values for parameters <code>CLEAR_ON_INIT</code> and <code>ENABLE_BYPASS</code> can be set using tasks in the SBY file. Under options, the mode of testing has to be specified along with the depth of iterations. Yosys supports solvers like z3, yices, boolector, etc for the smtbmc engine. If not specified, then the smtbmc engine picks any of the above solvers. One last step is to add design files and script specifying the top module. On running the SBY file, one would get to know what&#39;s the result of verification.</p>
-<pre style="background-color:darkgrey"><code>[<span class="hljs-keyword">tasks</span>]
+<pre style="background-color:silver"><code>[<span class="hljs-keyword">tasks</span>]
 enable_1_clear_0
 enable_0_clear_1
 [<span class="hljs-keyword">options</span>]
@@ -168,7 +168,7 @@ prep -top mor1kx_simple_dpram_sclk
 <br>
 <h4 id="true-dpram">True DPRAM</h4>
 <p><a href="https://github.com/Harshitha172000/mor1kx/blob/formal/rtl/verilog/mor1kx_true_dpram_sclk.v">True DPRAM</a>’s properties are somewhat similar to simple DPRAM but use two clocks, one for each port. I have used a global clock to handle two clocks A and B. At the posedge of clk_a or clk_b read and write operations of that port are verified.</p>
-<pre style="background-color:darkgrey"><code><span class="hljs-comment">/*------Formal Checking-------*/</span>
+<pre style="background-color:silver"><code><span class="hljs-comment">/*------Formal Checking-------*/</span>
 <span class="hljs-meta">`<span class="hljs-meta-keyword">ifdef</span> FORMAL</span>
    <span class="hljs-keyword">reg</span> f_past_valid;
    <span class="hljs-keyword">initial</span> f_past_valid = <span class="hljs-number">1'b0</span>;
@@ -196,7 +196,7 @@ prep -top mor1kx_simple_dpram_sclk
 <br><h4 id="lru-algorithm">LRU algorithm</h4>
 <p>Having verified DPRAM, I moved onto the <a href="https://github.com/Harshitha172000/mor1kx/blob/formal/rtl/verilog/mor1kx_cache_lru.v">least recently used algorithm</a> which is used to replace the least recently used block from cache. This is a fully combinational design module so it&#39;s much easier to verify. </p>
 <p>First, I assumed that inputs to variable access are one-hot encoded just to avoid random inputs that solvers might consider. Since this is an algorithm, I tried to verify its outcomes and asserted if the <code>lru_pre</code> (before access) and <code>lru_post</code> (after access) are also one-hot encoded.</p>
-<pre style="background-color:darkgrey"><code><span class="hljs-comment">/*-----Formal Checking-------*/</span>
+<pre style="background-color:silver"><code><span class="hljs-comment">/*-----Formal Checking-------*/</span>
 <span class="hljs-meta">`<span class="hljs-meta-keyword">ifdef</span> FORMAL</span>
    <span class="hljs-keyword">always</span> @(*) <span class="hljs-keyword">begin</span>
       <span class="hljs-keyword">assert</span> (NUMWAYS &gt; <span class="hljs-number">1</span>);
