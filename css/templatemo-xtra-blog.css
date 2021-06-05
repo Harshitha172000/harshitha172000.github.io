@@ -11,7 +11,7 @@ body {
     overflow-x: hidden;
 }
 
-p, span { color:navy; }
+p, span { color:darkslategrey; }
 hr { 
     border-top-color: black; 
     margin-top: 10px;
