@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Harshitha's Blog</title>
+	<link rel="stylesheet" href="fontawesome/css/all.min.css"> <!-- https://fontawesome.com/ -->
+	<!--<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">  https://fonts.google.com/ -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/templatemo-xtra-blog.css" rel="stylesheet">
+    <link rel="shortcut icon" href="img/favicon.ico" />
+
+</head>
+<body>
+        <body style="background-color:gainsboro">
+	<header class="tm-header" id="tm-header">
+        <div class="tm-header-wrapper">
+            <button class="navbar-toggler" type="button" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="tm-site-header">
+                
+                <h1 class="text-center">Harshitha's Blog</h1>
+            </div>
+            <nav class="tm-nav" id="tm-nav">            
+                <ul>
+                    <li class="tm-nav-item"><a href="index.html" class="tm-nav-link">
+                        <i class="fas fa-home"></i>
+                        Home
+                    </a></li>
+                    <li class="tm-nav-item"><a href="about.html" class="tm-nav-link">
+                        <i class="fas fa-users"></i>
+                        About Me
+                    </a></li>
+                </ul>
+            </nav>
+            <div class="tm-mb-65">
+                <a rel="nofollow" href="mailto:harshithasridhar172000@gmail.com" class="tm-social-link">
+                    <i class="fa fa-envelope tm-social-icon"></i>
+                </a>
+                <a href="https://twitter.com/Harshit49678822" class="tm-social-link">
+                    <i class="fab fa-twitter tm-social-icon"></i>
+                </a>
+                <a href="https://github.com/Harshitha172000" class="tm-social-link">
+                    <i class="fab fa-github tm-social-icon"></i>
+                </a>
+                <a href="https://linkedin.com/in/harshitha-s-" class="tm-social-link">
+                    <i class="fab fa-linkedin tm-social-icon"></i>
+                </a>
+            </div>
+           
+        </div>
+    </header>
+    <div class="container-fluid">
+        <main class="tm-main">
+            <!-- Search form 
+            <div class="row tm-row">
+                <div class="col-12">
+                    <form method="GET" class="form-inline tm-mb-80 tm-search-form">                
+                        <input class="form-control tm-search-input" name="query" type="text" placeholder="Search..." aria-label="Search">
+                        <button class="tm-search-button" type="submit">
+                            <i class="fas fa-search tm-search-icon" aria-hidden="true"></i>
+                        </button>                                
+                    </form>
+                </div>                
+            </div> -->   
+                             
+
+            <div class="row tm-row tm-mb-40">
+                <div class="col-12">                                                       
+                        <div class="mb-4">
+                            <h1 class="pt-2 tm-mb-40 tm-color-primary tm-post-title"><strong> Formal Verification of Mor1kx Processor </strong></h1>                       
+                            <p class="tm-mb-40">July 27, 2021 </p>
+<p>I have been working on the Mor1kx Formal project for a month, and I am glad that I have verified most of the cappuccino pipeline before the First evaluation of GSoC&#39;21. The best part of this learning phase is that it never ends. Whenever I invest some time in cappuccino design files, I come up with new Formal Verification techniques and validation methodologies that can verify the properties of our interests.</p>
+<p>In one of my <a href="https://harshitha172000.github.io/blog1.html">previous posts</a>, I briefly explained the approach to Mor1kx Formal. I had to have a broad view of <a href="https://github.com/openrisc/mor1kx">Mor1kx</a> Core and its behaviour before getting into Mor1kx Formal. Thanks to <a href="https://fusesoc.readthedocs.io/en/stable/">Fusesoc</a>, it gave me a way to understand the exemplary conduct of the mor1kx processor easily by looking at its waveforms. Whenever I need some clarifications on input assumptions, I have a look at its waveform. Assumptions are a crucial part of the test; wrong assumptions make the test meaningless. I also get ideas on what else to assert in the design. Moreover, fusesoc generated waveforms are much better than waveforms generated via cover statements.</p>
+<br>
+<h2><strong>Why Bottom to Top Approach?</strong></h2>
+<p>Formal Verification is much easier when we follow the Bottom to Top approach. Initially, we verify individual module properties and later integrate verified modules for further testing. Let&#39;s see how this approach makes things easier for the Fetch stage of the pipeline. First of all, it would be hard to begin with the fetch module without verifying its submodules. Why do we need to know about submodules? Fetch functionality is dependent on the output ports of cache and MMU. If any of these output interfaces are erroneously driven, then Fetch performance will be affected. Hence I started with DPRAM. Having verified modules of Simple DPRAM and LRU algorithm simplifies the formal check of Instruction Cache. IMMU testing without submodule verification may not guarantee the correctness of True DPRAM. Through this hierarchical validation, we can confirm the expected behavior of the submodule from the top module point of view.</p>
+<p><img src="img/fetch.png" alt="Image" class="img-fluid"></p>
+<p>This approach is good enough to verify the submodule interfaces of the CPU. But, I don&#39;t particularly like waiting hours for the solver to complete the proof. Top module testing involves an entire CPU core check where the solvers strive to turn submodule assertions false by exploring different design paths, slowing down the test. Hence, CPU level tests are limited to reset and input assumptions validation which fastens the Formal check.</p>
+
+<br>
+<h2 id="what-properties-do-i-choose-to-assert-"><strong>What properties do I choose to assert?</strong></h2>
+<p>I always had this query about what properties validation makes verification meaningful. The answer to this lies within the module, which we are intended to verify. It&#39;s good to prove the functionality formally, but we can do the same via the test bench. Then, why Formal? In the test bench verification, we examine the functionality of our design with few input combinations but can&#39;t assure a similar behaviour for every input combination. Formal tools help in identifing where the design goes out of our expectations, and here check is not restricted for a few input combinations, but the assertion should hold for any random input. Other than that, we can check interface properties and internal states. Many submodule interfaces within the CPU keep on communicating with each other, and it&#39;s very much necessary to confirm that output interfaces of modules are correctly driven. So, we should focus more on asserting output interface properties.</p>
+<br>
+<h2 id="-how-to-choose-formal-depth-"><strong>How to choose Formal Depth?</strong></h2>
+<p>This project relies on the <a href="http://www.clifford.at/papers/2016/yosys-smtbmc/">Yosys-smtbmc</a> engine and <a href="https://yices.csl.sri.com/">yices</a> solver. A default depth of 20 is chosen for verification. Although in some cases, it&#39;s not enough to verify checks for just 20 clock cycles. Hence, it&#39;s good to have a depth greater than N while verifying the functionality of operations that take at least N clock cycles to complete; else, the solver may result in <a href="https://en.wikipedia.org/wiki/Mathematical_induction">Induction</a> failure.</p>
+<p> Let&#39;s look at the serial multiplier, which takes about 32 clocks to compute the result. An attempt is made to prove that the number of clock cycles won&#39;t go beyond 33.</p>
+<pre style="background-color:silver"><code><span class="hljs-comment">// Valid multiplication output is seen after 32 clocks</span>
+   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> clk) <span class="hljs-keyword">begin</span>
+      <span class="hljs-keyword">if</span> (f_past_valid &amp; !pipeline_flush_i &amp; !<span class="hljs-built_in">$past</span>(pipeline_flush_i)) <span class="hljs-keyword">begin</span>
+
+         <span class="hljs-keyword">if</span> (f_op | f_op_valid_i)
+              <span class="hljs-meta">`ASSUME (!decode_valid_i);</span>
+         <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-built_in">$rose</span>(f_op_i))
+            <span class="hljs-comment">// When the operation starts decode_valid stays high</span>
+            <span class="hljs-meta">`ASSUME (decode_valid_i);</span>
+
+         <span class="hljs-comment">// Start counting when we see the operation start</span>
+         <span class="hljs-keyword">if</span> (<span class="hljs-built_in">$rose</span>(f_op_i) &amp; alu_valid_o) <span class="hljs-keyword">begin</span>
+               f_op &lt;= <span class="hljs-number">1</span>;
+               f_op_count &lt;= <span class="hljs-number">1</span>;
+         <span class="hljs-keyword">end</span>
+         <span class="hljs-comment">// Stop when op is done or abort if op_i goes low during execution.</span>
+         <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (f_op_valid_i | !f_op_i) <span class="hljs-keyword">begin</span>
+               f_op &lt;= <span class="hljs-number">0</span>;
+         <span class="hljs-keyword">end</span>
+
+             <span class="hljs-comment">// Count number of clock cycles taken to complete op</span>
+             <span class="hljs-keyword">if</span> (f_op) <span class="hljs-keyword">begin</span>
+                   f_op_count &lt;= f_op_count + <span class="hljs-number">1</span>;
+                   <span class="hljs-meta">`ASSUME (f_op_i);</span>
+                   <span class="hljs-meta">`ASSUME ($stable(f_stable_i));</span>
+             <span class="hljs-keyword">end</span>
+
+             <span class="hljs-comment">// Ensure the operation completes never going beyond max count</span>
+             <mark><strong><span class="hljs-keyword">assert</span> (f_op_count &lt;= OP_MAX_CLOCKS + <span class="hljs-number">1</span>);</strong></mark>
+      <span class="hljs-keyword">end</span> <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (pipeline_flush_i &amp; f_past_valid) <span class="hljs-keyword">begin</span>
+             f_op &lt;=<span class="hljs-number">0</span>;
+             f_op_count &lt;= <span class="hljs-number">0</span>;
+      <span class="hljs-keyword">end</span>
+</code></pre>
+<p>Test outcome will be <em>PASS</em> if both BMC and Induction clear the Formal evaluation. If there happens to be BMC failure irrespective of the Induction, the test will <em>FAIL</em>. BMC passing and Induction failing will result in an <em>UNKNOWN</em> proof.</p>
+<p>Highlighted assert statement requires a depth of clocks greater than 32. If we set depth as 20 BMC passes, but Induction fails. Thus, the result will be <em>UNKNOWN</em> as depicted in the following figure.</p>
+
+<p><img src="img/unknown.png" alt="Image" class="img-fluid"></p>
+If we increase the number of test clock cycles to 40 or more, it avoids Induction fail and the test passes.
+<p><img src="img/PASS.png" alt="Image" class="img-fluid"></p>
+<br>
+<br>
+<h2 id="-cappuccino-pipeline-verification-"><strong>Cappuccino Pipeline Verification</strong></h2>
+<p>A five-stage pipeline has many modules, and I haven&#39;t added assertions to modules that have only assign statements. Assign statements can change very frequently, and it may not bring forward any erroneous state. So, it&#39;s not worth maintaining assign statements as the solver always results in <em>PASS</em> for such tests.</p>
+<p>In the <a href="https://harshitha172000.github.io/blog2.html">last post</a>, I had discussed my initial work on <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_simple_dpram_sclk.v">DPRAM</a> and their Formal Verification. Having looked at modules like Cache gave me more insights on what other properties I can assert in DPRAM, I had to rework those modules again. I kept following this method, revisited verified properties, and received much exposure to Formal verification techniques day by day.</p>
+
+<br>
+<h3 id="-fetch-stage-"><strong>Fetch Stage</strong></h3>
+<p>Instruction <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_fetch_cappuccino.v">fetch</a> is the primary stage of the pipeline: submodules modules used are <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_icache.v">Cache</a>  and <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_immu.v">MMU</a> .</p>
+<p><strong>How I verified Cache?</strong></p>
+<p>Mor1kx Instruction Cache FSM handles refill, read and invalidate functions. To formally verify set-associative Cache, I have adopted the following method:</p>
+<ol>
+<li>First refill data <code>f_refill_data</code> at the address <code>f_refill_addr</code> in the cache. Use the <code>f_refilled</code> register to keep track of cache refill.</li>
+<li>After refill, the CPU request for address <code>f_refill_addr</code> should result in a cache hit.</li>
+<li>Data put on the output port on Cache hit should be the same as refilled data <code>f_refilled_data</code>.</li>
+<li>Let&#39;s invalidate the address <code>f_refill_addr</code> and keep track of this invalidation using the <code>f_invalidate</code> register.</li>
+<li>Now, I can assert not to have a cache hit for <code>f_refill_addr</code> after invalidation.</li>
+</ol>
+<pre style="background-color:silver"><code><span class="hljs-meta">`<span class="hljs-meta-keyword">ifdef</span> ICACHE</span>
+
+   (* anyconst *) <span class="hljs-keyword">wire</span> [OPTION_OPERAND_WIDTH-<span class="hljs-number">1</span>:<span class="hljs-number">0</span>] f_refill_addr;
+   (* anyconst *) <span class="hljs-keyword">reg</span> [OPTION_OPERAND_WIDTH-<span class="hljs-number">1</span>:<span class="hljs-number">0</span>] f_refill_data;
+   <span class="hljs-keyword">wire</span> f_this_refill;
+   <span class="hljs-keyword">reg</span> f_refilled;
+
+   <span class="hljs-keyword">initial</span> f_refilled = <span class="hljs-number">1'b0</span>;
+   <span class="hljs-keyword">assign</span> f_this_refill = (wradr_i == f_refill_addr) &amp;&amp; refill_o;
+
+   <span class="hljs-comment">//Refilling</span>
+   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> clk) <span class="hljs-keyword">begin</span>
+      <span class="hljs-keyword">if</span> (<span class="hljs-built_in">$past</span>(f_this_refill) &amp;&amp; (f_refill_data == wrdat_i) &amp;&amp;
+          !<span class="hljs-built_in">$past</span>(cache_hit_o)&amp;&amp; <span class="hljs-built_in">$past</span>(cpu_req_i)
+          &amp;&amp; f_past_valid &amp;&amp; !<span class="hljs-built_in">$past</span>(rst) &amp;&amp; <span class="hljs-built_in">$past</span>(state) == READ) <span class="hljs-keyword">begin</span>
+         <span class="hljs-keyword">assert</span> (refill);
+         f_refilled &lt;= <span class="hljs-number">1'b1</span>;
+         <span class="hljs-keyword">assert</span> (<span class="hljs-built_in">$onehot</span>(way_we));
+      <span class="hljs-keyword">end</span>
+   <span class="hljs-keyword">end</span>
+
+   <span class="hljs-comment">//Read: f_refill_data has to be returned if cpu requests for same address f_refill_addr.</span>
+   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> clk) <span class="hljs-keyword">begin</span>
+      <span class="hljs-keyword">if</span> (<span class="hljs-built_in">$rose</span>(f_refilled) &amp;&amp; (cpu_adr_match_i == f_refill_addr)
+          &amp;&amp; cache_hit_o &amp;&amp; f_past_valid &amp;&amp; !<span class="hljs-built_in">$past</span>(rst)) <span class="hljs-keyword">begin</span>
+         <span class="hljs-keyword">assert</span> (cpu_dat_o == f_refill_data);
+         <span class="hljs-keyword">assert</span> (read);
+         <span class="hljs-keyword">assert</span> (cpu_ack_o);
+      <span class="hljs-keyword">end</span>
+   <span class="hljs-keyword">end</span>
+
+   <span class="hljs-keyword">reg</span> f_after_invalidate;
+   <span class="hljs-keyword">initial</span> f_after_invalidate = <span class="hljs-number">1'b0</span>;
+
+   <span class="hljs-comment">//Invalidation: Checking if ways of set have invalid tag bit on set invalidation.</span>
+   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> clk) <span class="hljs-keyword">begin</span>
+      <span class="hljs-keyword">if</span> (<span class="hljs-built_in">$past</span>(invalidate_o) &amp;&amp; !<span class="hljs-built_in">$past</span>(refill) &amp;&amp; f_past_valid
+         &amp;&amp; <span class="hljs-built_in">$past</span>(spr_bus_dat_i) == f_refill_addr[WAY_WIDTH-<span class="hljs-number">1</span>:OPTION_ICACHE_BLOCK_WIDTH]
+         &amp;&amp; <span class="hljs-built_in">$past</span>(f_refilled) &amp;&amp; !<span class="hljs-built_in">$past</span>(f_refilled,<span class="hljs-number">2</span>)) <span class="hljs-keyword">begin</span>
+         <span class="hljs-keyword">assert</span> (spr_bus_ack_o);
+         <span class="hljs-keyword">assert</span> (invalidate);
+         <span class="hljs-keyword">assert</span> (!cpu_ack_o);
+         <span class="hljs-keyword">assert</span> (tag_we);
+         <span class="hljs-keyword">assert</span> (!tag_din[TAGMEM_WAY_VALID]);
+         f_after_invalidate &lt;= <span class="hljs-number">1</span>;
+      <span class="hljs-keyword">end</span>
+   <span class="hljs-keyword">end</span>
+
+   <span class="hljs-comment">//There shouldn't be any cache hit for f_refill_addr after invalidation.</span>
+   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> clk)
+      <span class="hljs-keyword">if</span> (cpu_adr_match_i == f_refill_addr &amp;&amp; <span class="hljs-built_in">$rose</span>(f_after_invalidate) &amp;&amp; f_past_valid)
+         <span class="hljs-keyword">assert</span> (!cache_hit_o);
+
+<span class="hljs-meta">`<span class="hljs-meta-keyword">endif</span></span>
+</code></pre><p>You can check out the complete Formal Verification of Mor1kx Instruction Cache <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_icache.v#L487#L679">here</a>.</p>
+<p><strong>Formally Verifying MMU</strong></p>
+<p><a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_immu.v>#L479#L596">MMU's</a> principal task is to map the given Virtual Address to a Physical Address. A virtual address has two parts: Virtual Page Number (VPN) and Page Offset. While Mapping MMU changes VPN to PPN (Physical Page Number), but the page offset remains unchanged. Things slow down if we look match to VPN in all memory locations. To avoid it, add a constraint that we have some way hit.</p>
+<p>Other properties to assert in MMU:</p>
+<ol>
+<li>On Translation Look Aside Buffer (TLB) miss, MMU shouldn&#39;t stop Cache from fetching Instruction.</li>
+<li>No more than one way hit for a match to a particular VPN.</li>
+</ol>
+<pre style="background-color:silver"><code>   (* anyconst *) <span class="hljs-keyword">wire</span> [OPTION_OPERAND_WIDTH-<span class="hljs-number">1</span>:<span class="hljs-number">0</span>] f_vaddr;
+
+   <span class="hljs-comment">//Physical Address of f_vaddr virtual address is asserted to verify expected PPN.</span>
+   <span class="hljs-comment">//Page bits = 13 bits</span>
+   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> clk) <span class="hljs-keyword">begin</span>
+      <span class="hljs-keyword">if</span> ((virt_addr_match_i == f_vaddr) &amp;&amp; way_hit[<span class="hljs-number">0</span>]
+          &amp;&amp; !way_huge[<span class="hljs-number">0</span>] &amp;&amp; !pagefault_o &amp;&amp; f_past_valid)
+         <span class="hljs-keyword">assert</span> ((phys_addr_o[<span class="hljs-number">12</span>:<span class="hljs-number">0</span>] == f_vaddr[<span class="hljs-number">12</span>:<span class="hljs-number">0</span>]) &amp;&amp;
+                 phys_addr_o[<span class="hljs-number">31</span>:<span class="hljs-number">13</span>] == itlb_trans_dout[<span class="hljs-number">0</span>][<span class="hljs-number">31</span>:<span class="hljs-number">13</span>]);
+   <span class="hljs-keyword">end</span>
+
+   <span class="hljs-comment">//On TLB miss, cache should not be inhibited.</span>
+   <span class="hljs-keyword">always</span> @(*)
+      <span class="hljs-keyword">if</span> (tlb_miss_o)
+      <span class="hljs-keyword">assert</span> (!cache_inhibit_o);
+
+   <span class="hljs-comment">//Way hits are one hot encoded.</span>
+   <span class="hljs-keyword">always</span> @(*)
+      <span class="hljs-keyword">assert</span> (<span class="hljs-built_in">$onehot0</span>(way_hit));
+</code></pre><p>Coming to Fetch, added reset validation and assert properties that are always true.</p>
+<ol>
+<li>The pipeline stall keeps the <code>fetch_valid_o</code> signal stable.</li>
+<li>Clear <code>fetch_valid_o</code> signal on branch misprediction.</li>
+<li>Pipeline flush should pull down the <code>fetch_valid_o</code> signal.</li>
+<li>Branch misprediction leads to stall insertion in the pipeline.</li>
+<li>Pipeline stall shouldn&#39;t advance pipeline to next stage.</li>
+</ol>
+<p>I have listed out the properties which I've verified, you can look into it <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_fetch_cappuccino.v#L645#L841">here</a>.</p>
+<br>
+<p><h3><strong>Decode Stage</strong></h3></p>
+<p>To formally verify the <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_decode.v">decode</a>, assert one-hot of decoded instructions.</p>
+<pre style="background-color:silver"><code>    <span class="hljs-keyword">assign</span> f_set_of_opcodes = {decode_op_lsu_load_o, decode_op_lsu_store_o,
+                                   decode_op_mfspr_o, decode_op_mtspr_o,
+                                   decode_op_rfe_o, decode_op_setflag_o,
+                                   decode_op_add_o, decode_op_mul_signed_o,
+                                   decode_op_mul_unsigned_o,
+                                   decode_op_div_signed_o,
+                                   decode_op_ext_o, decode_op_div_unsigned_o,
+                                   decode_op_shift_o, decode_op_ffl1_o,
+                                   decode_op_movhi_o, decode_op_msync_o,
+                                   decode_op_branch_o};
+
+   <span class="hljs-comment">//one instruction =&gt; one opcode</span>
+   <span class="hljs-keyword">always</span> @(*)
+      <span class="hljs-keyword">assert</span> (<span class="hljs-built_in">$onehot0</span>(f_set_of_opcodes));
+</code></pre>
+<br>
+<p><h3><strong>Execute Stage</strong></h3></p>
+<p>Mor1kx <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_execute_alu.v#L854#L1058">ALU</a> supports different architecture implementations. Here, I assert <code>$onehot</code> of opcodes—one instruction execution at a time.</p>
+<pre style="background-color:silver"><code>
+   <span class="hljs-keyword">assign</span> f_exec_opcodes = {op_add_i, op_mul_i, op_div_i,
+                            op_movhi_i, op_shift_i,
+                            op_ffl1_i, op_mtspr_i,
+                            op_mfspr_i, op_ext_i,
+                            op_jbr_i, op_jr_i};
+
+   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> clk)
+      <span class="hljs-keyword">if</span> (f_past_valid &amp;&amp; !<span class="hljs-built_in">$past</span>(rst))
+         <span class="hljs-meta">`ASSUME ($onehot0(f_exec_opcodes));</span>
+</code></pre><p>Along with that, we verified selectable parameters of ALU. My mentor Stafford Horne has created <a href="https://github.com/openrisc/mor1kx/blob/master/bench/formal/f_multiclock_op.v">Multi clock interface</a> to check the Serial ALU operations. We can reuse this interface to verify the serial multiplier, divider, and shifter.</p>
+<br>
+<p><h3><strong>Control/Memory Stage</strong></h3></p>
+<p>There are plenty of modules to be verified in this stage. Load Store Unit (LSU) and Control modules are major ones.</p>
+<p>Properties verified in <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_icache.v">ICACHE</a> and <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_dcache.v">DCACHE</a> are not too different as both have the same functionality. I spent a good time asserting the ICACHE properties and could reuse them in DCACHE also. I have used this time-saving property reuse strategy even in IMMU/DMMU.</p>
+<p>Store buffer is another module initialized in LSU. Properties verified in this are as follows:</p>
+<ol>
+<li>Flag <code>full_o</code> (<code>empty_o</code>) stays high when the FIFO buffer is full (empty).</li>
+<li>Write pointer (Read pointer) remains stable if there is no <code>write_i</code> (<code>read_i</code>) signal.</li>
+<li>Both <code>empty_o</code> and <code>full_o</code> cannot be high at the same time.</li>
+<li>Assume no <code>write_i</code> (<code>read_i</code>) signal when the buffer is Full (Empty) and assert the same in the top module test.</li>
+</ol>
+<p>Check out how I formally verified store buffer <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_store_buffer.v#L89#L176">here</a>. Complete Verification of <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_lsu_cappuccino.v#L871#L1179">LSU</a> covers all its submodule validations.</p>
+<p>Control generates SPR signals to all other interfaces. So, many SPR based properties are asserted <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_ctrl_cappuccino.v#L1590#L1818">here</a>, along with the properties of debug interface.</p>
+<p>It&#39;s essential to verify all helper modules like <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_dcache.v">Cache,</a> <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_store_buffer.v">store buffer</a>, and many more before moving to parts like <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_fetch_cappuccino.v">Fetch</a>, <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_ctrl_cappuccino.v">Control</a>, and <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_lsu_cappuccino.v">Load Store Unit.</a> Cappuccino core is highly configurable, so all selectable parameters have to be verified for completeness. Proof of individual module properties completes within few minutes for a given depth of 20. But the CPU level test slows down if the depth given is more than ten clocks.</p>
+<br>
+<p><h2><strong>CI of Formal checks</strong></h2></p>
+<p>I have added Formal tests to <a href="https://github.com/openrisc/mor1kx/blob/master/.github/workflows/ci.yml#L101#L151">mor1kx CI</a> by creating a job that installs Yosys-Formal tools and their dependencies. To verify the formal test, run the following command.</p>
+<p><pre style="background-color:silver"><code> make -C bench/formal</code></pre></p>
+<p>This command verifies all the SBY files in the <code>formal</code> directory. To verify single module run <pre style="background-color:silver"><code> make -C bench/formal &lt;file_name&gt;</code></pre> </p>
+<br>
+<h2 id="-challenges-"><strong>Challenges</strong></h2>
+<p>Initially, it was difficult for me to understand the source code. Having spent some time with RTL code, everything seemed to be clear. I didn’t have much experience with Formal tools but handling BMC and Induction fail gave me more confidence. Interesting part is how we get grips with Induction failure. BMC failure can be easily resolved with a good initial state but induction can start with any bad state. We often reset the design before starting but induction can take up the state of the design when it's not reset.</p>
+<br>
+<p><h2><strong>Merged Pull Requests</strong></h2></p>
+<ol>
+<li><a href="https://github.com/openrisc/mor1kx/pull/120/commits/7fc989ff6370bb0a6bb148b4ef86c9c7c91e23b4">Formal Verification of Cappuccino</a></li>
+<li><a href="https://github.com/openrisc/mor1kx/pull/128/files">Formal Checks CI</a></li>
+</ol>
+<br>
+<p><h2><strong>What&#39;s next?</strong></h2></p>
+<p>Now, SPR properties are verified inside every module, more like repeating the same checks. I aspire to generalize all SPR properties in the module and reuse them with an SPR interface. I'm also expecting to develop one for the Wishbone interface.</p>
+
+
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+            <footer class="row tm-row">
+            </footer> 
+        </main>
+    </div>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/templatemo-script.js"></script>
+</body>
+</html>

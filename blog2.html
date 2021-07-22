@@ -4,17 +4,10 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Harshitha's Blog</title>
-	<link rel="stylesheet" href="fontawesome/css/all.min.css"> <!-- https://fontawesome.com/ -->
-	<!--<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">  https://fonts.google.com/ -->
+	<link rel="stylesheet" href="fontawesome/css/all.min.css">
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/templatemo-xtra-blog.css" rel="stylesheet">
-<!--
-    
-TemplateMo 553 Xtra Blog
-
-https://templatemo.com/tm-553-xtra-blog
-
--->
+    <link rel="shortcut icon" href="img/favicon.ico" />
 </head>
 <body>
         <body style="background-color:gainsboro">
@@ -33,18 +26,10 @@ https://templatemo.com/tm-553-xtra-blog
                         <i class="fas fa-home"></i>
                         Home
                     </a></li>
-                    <!--<li class="tm-nav-item active"><a href="post.html" class="tm-nav-link">
-                        <i class="fas fa-pen"></i>
-                        Posts
-                    </a></li>-->
                     <li class="tm-nav-item"><a href="about.html" class="tm-nav-link">
                         <i class="fas fa-users"></i>
                         About Me
                     </a></li>
-                    <!--<li class="tm-nav-item"><a href="contact.html" class="tm-nav-link">
-                        <i class="far fa-comments"></i>
-                        Contact 
-                    </a></li>-->
                 </ul>
             </nav>
             <div class="tm-mb-65">
@@ -65,20 +50,8 @@ https://templatemo.com/tm-553-xtra-blog
         </div>
     </header>
     <div class="container-fluid">
-        <main class="tm-main">
-            <!-- Search form 
-            <div class="row tm-row">
-                <div class="col-12">
-                    <form method="GET" class="form-inline tm-mb-80 tm-search-form">                
-                        <input class="form-control tm-search-input" name="query" type="text" placeholder="Search..." aria-label="Search">
-                        <button class="tm-search-button" type="submit">
-                            <i class="fas fa-search tm-search-icon" aria-hidden="true"></i>
-                        </button>                                
-                    </form>
-                </div>                
-            </div> -->   
+        <main class="tm-main">  
                              
-
             <div class="row tm-row tm-mb-40">
                 <div class="col-12">                                                       
                         <div class="mb-4">
@@ -94,107 +67,139 @@ https://templatemo.com/tm-553-xtra-blog
 <p>To formally verify, do I need to understand the code? Definitely yes! Without knowing the code, it&#39;s impossible to assert conditions. Having an excellent exposure to design and its environment would help declare assertions quickly. We can also add constraints to the design space by including assume statements in the code.</p>
 <p>With this basic idea, it&#39;s good to move ahead with <a href="http://www.clifford.at/papers/2016/yosys-synth-formal/">Yosys formal</a>. I have started my project earlier and have verified tiny modules like simple DPRAM, true DPRAM, and the least recently used algorithm. These modules are part of the instruction cache, data cache, and memory management unit.</p>
 <br><h3 id="formally-verifying-mor1kx-s-dpram-lru-algorithm">Formally Verifying Mor1kx’s DPRAM, LRU Algorithm</h3>
-<p>Mor1kx cache memory uses DPRAM to store its contents. The instruction cache is simple DPRAM based, and the data cache is true DPRAM based. </p>
+<p>Mor1kx cache memory uses DPRAM to store its contents. The Instruction cache/Data cache is simple DPRAM based, and the MMU is true DPRAM based. </p>
 <br><h4 id="simple-dpram">Simple DPRAM</h4>
-<p>To check <a href="https://github.com/Harshitha172000/mor1kx/blob/formal/rtl/verilog/mor1kx_simple_dpram_sclk.v">simple dpram</a>’s correctness, 
+<p>To check <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_simple_dpram_sclk.v">simple dpram</a>’s correctness, 
 I need to verify a few properties based on its code.</p>
-<p><code>CLEAR_ON_INIT</code> and <code>ENABLE_BYPASS</code> are two design parameters that can be controlled externally.</p>
 <ol>
-<li>On <code>CLEAR_ON_INIT</code>, all the contents of the memory have to be initialized to zero.</li>
-<li>On <code>ENABLE_BYPASS</code>, <code>dout</code> is the same as the <code>din</code> in the previous clock cycle.</li>
+<li>Data on the output port changes only if read enable is high.</li>
+<li>If bypass is enabled, write data should forward data to the output port, given both write and read addresses are the same</li>
 <li>Verifying read or write operation on memory.</li>
 </ol>
 
-
-<pre style="background-color:silver"><code> if (<span class="hljs-name">CLEAR_ON_INIT</span>) begin
-        for <span class="hljs-name">(address =</span> <span class="hljs-number">0</span><span class="hljs-comment">; address &lt; (1&lt;&lt;ADDR_WIDTH); address = address + 1) </span>
-           assert (<span class="hljs-name">mem</span>[address] == <span class="hljs-number">32</span>'d0)<span class="hljs-comment">;</span>
-</code></pre><p>The above assertion checks for the first property which is straightforward.</p>
-<p>For the second property, I have added all necessary conditions which trigger the bypass state and asserted its expected outcome. I have used <code>f_past_valid</code> to keep track of <code>$past()</code>.</p>
-<pre style="background-color:silver"><code>if ($past(<span class="hljs-name">we</span>) &amp; $past(<span class="hljs-name">re</span>) &amp; ($past(<span class="hljs-name">waddr</span>) == $past(<span class="hljs-name">raddr</span>)) &amp; <span class="hljs-name"><span class="hljs-name">ENABLE_BYPASS</span></span> &amp; <span class="hljs-name"><span class="hljs-name">f_past_valid</span></span>)
-        assert (<span class="hljs-name">dout</span> == $past(<span class="hljs-name">din</span>))<span class="hljs-comment">;</span>
-</code></pre><p>The third property covers the rest of the cases other than <code>ENABLE_BYPASS</code>  and <code>CLEAR_ON_INIT</code>. 
-It checks for the normal read and writes operation of dpram. On read, data requested is put on the output data port in the next clock cycle. Similarly, data written into memory can be observed after one clock cycle.</p>
-<pre style="background-color:silver"><code>      if ($past(<span class="hljs-name">we</span>) &amp; <span class="hljs-name">f_past_valid</span>)
-        assert (<span class="hljs-name">mem</span>[$past(<span class="hljs-name">waddr</span>)] == $past(<span class="hljs-name">din</span>))<span class="hljs-comment">;</span>
-
-      if ($past(<span class="hljs-name">re</span>) &amp; <span class="hljs-name">f_past_valid</span> &amp; !<span class="hljs-name">ENABLE_BYPASS</span>)
-        assert (<span class="hljs-name">dout</span> == $past(<span class="hljs-name">mem</span>[raddr]))<span class="hljs-comment">;</span>
 </code></pre><p>Here, is the complete formal section of simple dpram.</p>
-<pre style="background-color:silver"><code><span class="hljs-comment">/*-----Formal checking------*/</span>
-<span class="hljs-meta">`<span class="hljs-meta-keyword">ifdef</span> FORMAL</span>
-   <span class="hljs-keyword">reg</span> f_past_valid;
-   <span class="hljs-keyword">reg</span> [<span class="hljs-number">31</span>:<span class="hljs-number">0</span>] address;
-   <span class="hljs-keyword">initial</span> f_past_valid = <span class="hljs-number">1'b0</span>;
-   <span class="hljs-keyword">initial</span> rdata = <span class="hljs-number">0</span>;
+<pre style="background-color:silver"><code><span class="hljs-meta">`<span class="hljs-meta-keyword">ifdef</span> SDPRAM</span>
+
+   <span class="hljs-keyword">reg</span> f_written</span>;
+   <span class="hljs-keyword">initial</span> f_written = <span class="hljs-number">0</span>;
+
+   <span class="hljs-comment">//Writing f_data at address f_addr</span>
    <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> clk)
-      f_past_valid &lt;= <span class="hljs-number">1'b1</span>;
-   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> clk) <span class="hljs-keyword">begin</span>
-      <span class="hljs-keyword">if</span> (<span class="hljs-built_in">$past</span>(we) &amp; <span class="hljs-built_in">$past</span>(re) &amp; (<span class="hljs-built_in">$past</span>(waddr) == <span class="hljs-built_in">$past</span>(raddr)) &amp; ENABLE_BYPASS &amp; f_past_valid)
+      <span class="hljs-keyword">if</span> (f_past_valid &amp;&amp; <span class="hljs-built_in">$past</span>(we) &amp;&amp; <span class="hljs-built_in">$past</span>(waddr) == f_addr &amp;&amp; !ENABLE_BYPASS &amp;&amp; <span class="hljs-built_in">$past</span>(din) == f_data)
+         f_written &lt;= <span class="hljs-number">1</span>;
+
+   <span class="hljs-comment">//Read access for address f_addr should return f_data</span>
+   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> clk)
+      <span class="hljs-keyword">if</span> (f_past_valid &amp;&amp; <span class="hljs-built_in">$past</span>(re) &amp;&amp; <span class="hljs-built_in">$past</span>(raddr) == f_addr &amp;&amp; !ENABLE_BYPASS &amp;&amp; <span class="hljs-built_in">$rose</span>(f_written))
+        <span class="hljs-keyword">assert</span> (dout == f_data);
+
+<span class="hljs-meta">`<span class="hljs-meta-keyword">endif</span></span>
+
+   <span class="hljs-comment">//Verifying Bypass logic of SDPRAM</span>
+   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> clk)
+      <span class="hljs-keyword">if</span> (f_past_valid &amp;&amp; <span class="hljs-built_in">$past</span>(we) &amp;&amp; <span class="hljs-built_in">$past</span>(re) &amp;&amp; <span class="hljs-built_in">$past</span>(waddr) == f_addr &amp;&amp; <span class="hljs-built_in">$past</span>(raddr) == f_addr &amp;&amp; ENABLE_BYPASS)
         <span class="hljs-keyword">assert</span> (dout == <span class="hljs-built_in">$past</span>(din));
-      <span class="hljs-keyword">if</span> (<span class="hljs-built_in">$past</span>(we) &amp; f_past_valid)
-        <span class="hljs-keyword">assert</span> (mem[<span class="hljs-built_in">$past</span>(waddr)] == <span class="hljs-built_in">$past</span>(din));
-      <span class="hljs-keyword">if</span> (<span class="hljs-built_in">$past</span>(re) &amp; f_past_valid &amp; !ENABLE_BYPASS)
-        <span class="hljs-keyword">assert</span> (dout == <span class="hljs-built_in">$past</span>(mem[raddr]));
-      <span class="hljs-keyword">if</span> (CLEAR_ON_INIT) <span class="hljs-keyword">begin</span>
-        <span class="hljs-keyword">for</span> (address = <span class="hljs-number">0</span>; address &lt; (<span class="hljs-number">1</span>&lt;&lt;ADDR_WIDTH); address = address + <span class="hljs-number">1</span>) 
-           <span class="hljs-keyword">assert</span> (mem[address] == <span class="hljs-number">32'd0</span>);
-      <span class="hljs-keyword">end</span>
-   <span class="hljs-keyword">end</span>
+
+   <span class="hljs-comment">//Output data should remain unchanged if there is no read enable</span>
+   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> clk)
+      <span class="hljs-keyword">if</span> (f_past_valid &amp;&amp; !<span class="hljs-built_in">$past</span>(re))
+         <span class="hljs-keyword">assert</span> (<span class="hljs-built_in">$stable</span>(dout));
+
+   <span class="hljs-comment">//Output data changes only if there is read or write enable</span>
+   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> clk)
+      <span class="hljs-keyword">if</span> (f_past_valid &amp;&amp; <span class="hljs-built_in">$changed</span>(dout))
+         <span class="hljs-keyword">assert</span> (<span class="hljs-built_in">$past</span>(re) | <span class="hljs-built_in">$past</span>(we));
 <span class="hljs-meta">`<span class="hljs-meta-keyword">endif</span></span>
 </code></pre>
 <br>
 <p>After adding formal declarations to the source file, the very next step is to <a href="https://symbiyosys.readthedocs.io/en/latest/reference.html">configure the SBY file</a>.
-Different values for parameters <code>CLEAR_ON_INIT</code> and <code>ENABLE_BYPASS</code> can be set using tasks in the SBY file. Under options, the mode of testing has to be specified along with the depth of iterations. Yosys supports solvers like z3, yices, boolector, etc for the smtbmc engine. If not specified, then the smtbmc engine picks any of the above solvers. One last step is to add design files and script specifying the top module. On running the SBY file, one would get to know what&#39;s the result of verification.</p>
-<pre style="background-color:silver"><code>[<span class="hljs-keyword">tasks</span>]
-enable_1_clear_0
-enable_0_clear_1
-[<span class="hljs-keyword">options</span>]
+Different values for parameters <code>ENABLE_BYPASS</code> can be set using tasks in the SBY file. Under options, the mode of testing has to be specified along with the depth of iterations. Yosys supports solvers like z3, yices, boolector, etc for the smtbmc engine. If not specified, then the smtbmc engine picks any of the above solvers. One last step is to add design files and script specifying the top module. On running the SBY file, one would get to know what&#39;s the result of verification.</p>
+<pre style="background-color:silver"><code>[tasks]
+BYPASS bypass
+NO_BYPASS no_bypass
+
+[options]
 mode prove
-depth 30
+depth <span class="hljs-number">20</span>
 wait on
-[<span class="hljs-keyword">engines</span>]
+
+[engines]
 smtbmc yices
-[<span class="hljs-keyword">script</span>]
-read -formal mor1kx_simple_dpram_sclk.v
-enable_1_clear_0: chparam -<span class="hljs-comment">set ENABLE_BYPASS 1 mor1kx_simple_dpram_sclk</span>
-enable_1_clear_0: chparam <span class="hljs-comment">-set CLEAR_ON_INIT 0 mor1kx_simple_dpram_sclk</span>
-enable_0_clear_1: chparam <span class="hljs-comment">-set ENABLE_BYPASS 0 mor1kx_simple_dpram_sclk</span>
-enable_0_clear_1: chparam <span class="hljs-comment">-set CLEAR_ON_INIT 1 mor1kx_simple_dpram_sclk</span>
-prep -top mor1kx_simple_dpram_sclk
-[<span class="hljs-keyword">files</span>]
+
+[script]
+
+read -formal -D SDPRAM mor1kx_simple_dpram_sclk.v
+--pycode-begin--
+<span class="hljs-keyword">cmd</span><span class="bash"> = <span class="hljs-string">"hierarchy -top mor1kx_simple_dpram_sclk"</span>
+</span><span class="hljs-keyword">cmd</span><span class="bash">+= <span class="hljs-string">" -chparam ENABLE_BYPASS %d"</span> % (1 <span class="hljs-keyword">if</span> <span class="hljs-string">"bypass"</span> <span class="hljs-keyword">in</span> tags <span class="hljs-keyword">else</span> 0)
+</span>output(<span class="hljs-keyword">cmd</span>)<span class="bash">
+</span>--pycode-end--
+
+prep  -top mor1kx_simple_dpram_sclk
+
+[files]
 ../../rtl/verilog/mor1kx_simple_dpram_sclk.v
 </code></pre>
 <br>
 <h4 id="true-dpram">True DPRAM</h4>
-<p><a href="https://github.com/Harshitha172000/mor1kx/blob/formal/rtl/verilog/mor1kx_true_dpram_sclk.v">True DPRAM</a>’s properties are somewhat similar to simple DPRAM but use two clocks, one for each port. I have used a global clock to handle two clocks A and B. At the posedge of clk_a or clk_b read and write operations of that port are verified.</p>
-<pre style="background-color:silver"><code><span class="hljs-comment">/*------Formal Checking-------*/</span>
-<span class="hljs-meta">`<span class="hljs-meta-keyword">ifdef</span> FORMAL</span>
-   <span class="hljs-keyword">reg</span> f_past_valid;
-   <span class="hljs-keyword">initial</span> f_past_valid = <span class="hljs-number">1'b0</span>;
-   (* gclk *) <span class="hljs-keyword">reg</span> global_clock;
+<p><a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_true_dpram_sclk.v">True DPRAM</a>’s properties are somewhat similar to simple DPRAM but use two clocks, one for each port. I have used a global clock to handle two clocks A and B. At the posedge of clk_a or clk_b read and write operations of that port are verified.</p>
+<pre style="background-color:silver"><code>   <span class="hljs-keyword">reg</span> f_write_a;
+   <span class="hljs-keyword">initial</span> f_write_a = <span class="hljs-number">0</span>;
+   <span class="hljs-keyword">reg</span> f_write_b;
+   <span class="hljs-keyword">initial</span> f_write_b = <span class="hljs-number">0</span>;
+
    <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> global_clock) <span class="hljs-keyword">begin</span>
-      f_past_valid = <span class="hljs-number">1'b1</span>;
-      <span class="hljs-keyword">assume</span> (addr_a != addr_b);
-   <span class="hljs-keyword">end</span>
-   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> global_clock) <span class="hljs-keyword">begin</span>
+
       <span class="hljs-keyword">if</span> (<span class="hljs-built_in">$rose</span>(clk_a)) <span class="hljs-keyword">begin</span>
-         <span class="hljs-keyword">if</span> (<span class="hljs-built_in">$past</span>(we_a) &amp; f_past_valid)
-            <span class="hljs-keyword">assert</span> (dout_a == <span class="hljs-built_in">$past</span>(din_a));
-         <span class="hljs-keyword">if</span> (<span class="hljs-built_in">$past</span>(!we_a) &amp; f_past_valid)
-            <span class="hljs-keyword">assert</span> (<span class="hljs-built_in">$past</span>(mem[addr_a]) == dout_a);
+         <span class="hljs-comment">//Port A: Writing f_data_a at address f_addr</span>
+         <span class="hljs-keyword">if</span> (<span class="hljs-built_in">$past</span>(we_a) &amp;&amp; <span class="hljs-built_in">$past</span>(addr_a) == f_addr &amp;&amp; <span class="hljs-built_in">$past</span>(din_a) == f_data_a &amp;&amp; f_past_valid) <span class="hljs-keyword">begin</span>
+            <span class="hljs-keyword">assert</span> (dout_a == f_data_a);
+            f_write_a &lt;= <span class="hljs-number">1</span>;
+         <span class="hljs-keyword">end</span>
+         <span class="hljs-comment">//Port A: Reading data from address f_addr</span>
+         <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">$past</span>(we_a) &amp;&amp; <span class="hljs-built_in">$past</span>(addr_a) == f_addr &amp;&amp; f_past_valid &amp;&amp; <span class="hljs-built_in">$rose</span>(f_write_a))
+            <span class="hljs-keyword">assert</span> (dout_a == f_data_a);
       <span class="hljs-keyword">end</span>
+
       <span class="hljs-keyword">if</span> (<span class="hljs-built_in">$rose</span>(clk_b)) <span class="hljs-keyword">begin</span>
-         <span class="hljs-keyword">if</span> (<span class="hljs-built_in">$past</span>(we_b) &amp; f_past_valid)
-            <span class="hljs-keyword">assert</span> (dout_b == <span class="hljs-built_in">$past</span>(din_b));
-         <span class="hljs-keyword">if</span> (<span class="hljs-built_in">$past</span>(!we_b) &amp; f_past_valid)
-            <span class="hljs-keyword">assert</span> (<span class="hljs-built_in">$past</span>(mem[addr_b]) == dout_b);
+         <span class="hljs-comment">//Port B: Writing f_data_b at address f_addr</span>
+         <span class="hljs-keyword">if</span> (<span class="hljs-built_in">$past</span>(we_b) &amp;&amp; <span class="hljs-built_in">$past</span>(addr_b) == f_addr &amp;&amp; <span class="hljs-built_in">$past</span>(din_b) == f_data_b &amp;&amp; f_past_valid) <span class="hljs-keyword">begin</span>
+            <span class="hljs-keyword">assert</span> (dout_b == f_data_b);
+            f_write_b &lt;= <span class="hljs-number">1</span>;
+         <span class="hljs-keyword">end</span>
+         <span class="hljs-comment">//Port B: Writing f_data_b at address f_addr</span>
+         <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">$past</span>(we_b) &amp;&amp; <span class="hljs-built_in">$past</span>(addr_b) == f_addr &amp;&amp; f_past_valid &amp;&amp; <span class="hljs-built_in">$rose</span>(f_write_b))
+            <span class="hljs-keyword">assert</span> (dout_b == f_data_b);
       <span class="hljs-keyword">end</span>
    <span class="hljs-keyword">end</span>
+
 <span class="hljs-meta">`<span class="hljs-meta-keyword">endif</span></span>
-</code></pre><br><p>I would like to highlight the importance of initial assumptions. Initially, I didn’t give much importance to initial assumptions, when I was stuck with BMC failures then I realized their significance. If these assumptions were included, then the solver starts with the good state and checks our assertions for N bounded steps. BMC is completely dependent on initial assumptions, if not assumed correctly then it&#39;s quite obvious that BMC fails. </p>
+
+   <span class="hljs-comment">//Port A output data changes only if there is read or write access at port A</span>
+   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> clk_a)
+      <span class="hljs-keyword">if</span> (f_past_valid &amp;&amp; <span class="hljs-built_in">$changed</span>(dout_a))
+         <span class="hljs-keyword">assert</span> (<span class="hljs-built_in">$past</span>(we_a) | !<span class="hljs-built_in">$past</span>(we_a));
+
+   <span class="hljs-comment">//Port B output data changes only if there is read or write access at port B</span>
+   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> clk_b)
+      <span class="hljs-keyword">if</span> (f_past_valid &amp;&amp; <span class="hljs-built_in">$changed</span>(dout_b))
+         <span class="hljs-keyword">assert</span> (<span class="hljs-built_in">$past</span>(we_b) | !<span class="hljs-built_in">$past</span>(we_b));
+
+   <span class="hljs-comment">//Port B shouldn't be affected by write signals of port A</span>
+   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> global_clock)
+      <span class="hljs-keyword">if</span> (f_past_valid &amp;&amp; <span class="hljs-built_in">$rose</span>(clk_a) &amp;&amp; <span class="hljs-built_in">$fell</span>(clk_b) &amp;&amp; <span class="hljs-built_in">$past</span>(we_a))
+         <span class="hljs-keyword">assert</span> (<span class="hljs-built_in">$stable</span>(dout_b));
+
+   <span class="hljs-comment">//Port A shouldn't be affected by write signals of port B</span>
+   <span class="hljs-keyword">always</span> @(<span class="hljs-keyword">posedge</span> global_clock)
+      <span class="hljs-keyword">if</span> (f_past_valid &amp;&amp; <span class="hljs-built_in">$rose</span>(clk_b) &amp;&amp; <span class="hljs-built_in">$fell</span>(clk_a) &amp;&amp; <span class="hljs-built_in">$past</span>(we_b))
+         <span class="hljs-keyword">assert</span> (<span class="hljs-built_in">$stable</span>(dout_a));
+
+<span class="hljs-meta">`<span class="hljs-meta-keyword">endif</span></span>
+<span class="hljs-keyword">endmodule</span>
+</code></pre>
 <br><h4 id="lru-algorithm">LRU algorithm</h4>
-<p>Having verified DPRAM, I moved onto the <a href="https://github.com/Harshitha172000/mor1kx/blob/formal/rtl/verilog/mor1kx_cache_lru.v">least recently used algorithm</a> which is used to replace the least recently used block from cache. This is a fully combinational design module so it&#39;s much easier to verify. </p>
+<p>Having verified DPRAM, I moved onto the <a href="https://github.com/openrisc/mor1kx/blob/master/rtl/verilog/mor1kx_cache_lru.v">least recently used algorithm</a> which is used to replace the least recently used block from cache. This is a fully combinational design module so it&#39;s much easier to verify. </p>
 <p>First, I assumed that inputs to variable access are one-hot encoded just to avoid random inputs that solvers might consider. Since this is an algorithm, I tried to verify its outcomes and asserted if the <code>lru_pre</code> (before access) and <code>lru_post</code> (after access) are also one-hot encoded.</p>
 <pre style="background-color:silver"><code><span class="hljs-comment">/*-----Formal Checking-------*/</span>
 <span class="hljs-meta">`<span class="hljs-meta-keyword">ifdef</span> FORMAL</span>
@@ -209,80 +214,16 @@ prep -top mor1kx_simple_dpram_sclk
 <br>
 <p>We have seen that all the properties I have tested on Mor1kx&#39;s DPRAM and LRU algorithm are satisfied. Now, I will be moving on to the instruction cache verification. For the upcoming week, I plan to verify the Instruction memory management unit and Instruction fetch modules. I am hoping to find some interesting parts of Mor1kx there.</p>
                               
-                             <!-- <span class="d-block text-right tm-color-primary">Creative . Design . Business</span>-->
                         </div>
                     </div>                    
                 </div>
             
                         
-                        <!-- Comments 
-                        <div>
-                            <h2 class="tm-color-primary tm-post-title">Comments</h2>
-                            <hr class="tm-hr-primary tm-mb-45">
-                           
-                            <form action="" class="mb-5 tm-comment-form">
-                                <h2 class="tm-color-primary tm-post-title mb-4">Your comment</h2>
-                                <div class="mb-4">
-                                    <input class="form-control" name="name" type="text">
-                                </div>
-                                <div class="mb-4">
-                                    <input class="form-control" name="email" type="text">
-                                </div>
-                                <div class="mb-4">
-                                    <textarea class="form-control" name="message" rows="6"></textarea>
-                                </div>
-                                <div class="text-right">
-                                    <button class="tm-btn tm-btn-primary tm-btn-small">Submit</button>                        
-                                </div>                                
-                            </form>                          
-                        </div>-->
                     </div>
                 </div>
             </div>
-                <!--<aside class="col-lg-4 tm-aside-col">
-                    <div class="tm-post-sidebar">
-                        <hr class="mb-3 tm-hr-primary">
-                        <h2 class="mb-4 tm-post-title tm-color-primary">Categories</h2>
-                        <ul class="tm-mb-75 pl-5 tm-category-list">
-                            <li><a href="#" class="tm-color-primary">Visual Designs</a></li>
-                            <li><a href="#" class="tm-color-primary">Travel Events</a></li>
-                            <li><a href="#" class="tm-color-primary">Web Development</a></li>
-                            <li><a href="#" class="tm-color-primary">Video and Audio</a></li>
-                            <li><a href="#" class="tm-color-primary">Etiam auctor ac arcu</a></li>
-                            <li><a href="#" class="tm-color-primary">Sed im justo diam</a></li>
-                        </ul>
-                        <hr class="mb-3 tm-hr-primary">
-                        <h2 class="tm-mb-40 tm-post-title tm-color-primary">Related Posts</h2>
-                        <a href="#" class="d-block tm-mb-40">
-                            <figure>
-                                <img src="img/capp.png" alt="Image" class="mb-3 img-fluid">
-                                <figcaption class="tm-color-primary">Duis mollis diam nec ex viverra scelerisque a sit</figcaption>
-                            </figure>
-                        </a>
-                        <a href="#" class="d-block tm-mb-40">
-                            <figure>
-                                <img src="img/img-05.jpg" alt="Image" class="mb-3 img-fluid">
-                                <figcaption class="tm-color-primary">Integer quis lectus eget justo ullamcorper ullamcorper</figcaption>
-                            </figure>
-                        </a>
-                        <a href="#" class="d-block tm-mb-40">
-                            <figure>
-                                <img src="img/img-06.jpg" alt="Image" class="mb-3 img-fluid">
-                                <figcaption class="tm-color-primary">Nam lobortis nunc sed faucibus commodo</figcaption>
-                            </figure>
-                        </a>
-                    </div>                    
-                </aside>-->
             </div>
             <footer class="row tm-row">
-               
-              <!--  <div class="col-md-6 col-12 tm-color-gray">
-                    
-                    Design: <a rel="nofollow" target="_parent" href="https://templatemo.com" class="tm-external-link">TemplateMo</a>
-                </div>-->
-                <!--  <div class="col-md-6 col-12 tm-color-gray tm-copyright">
-                    Copyright 2020 Xtra Blog Company Co. Ltd.
-                </div>-->
             </footer> 
         </main>
     </div>
