@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Harshitha's Blog</title>
+	<link rel="stylesheet" href="fontawesome/css/all.min.css"> <!-- https://fontawesome.com/ -->
+	<!--<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">  https://fonts.google.com/ -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/templatemo-xtra-blog.css" rel="stylesheet">
+    <link rel="shortcut icon" href="img/favicon.ico" />
+
+</head>
+<body>
+        <body style="background-color:gainsboro">
+	<header class="tm-header" id="tm-header">
+        <div class="tm-header-wrapper">
+            <button class="navbar-toggler" type="button" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="tm-site-header">
+                
+                <h1 class="text-center">Harshitha's Blog</h1>
+            </div>
+            <nav class="tm-nav" id="tm-nav">            
+                <ul>
+                    <li class="tm-nav-item"><a href="index.html" class="tm-nav-link">
+                        <i class="fas fa-home"></i>
+                        Home
+                    </a></li>
+                    <li class="tm-nav-item"><a href="about.html" class="tm-nav-link">
+                        <i class="fas fa-users"></i>
+                        About Me
+                    </a></li>
+                </ul>
+            </nav>
+            <div class="tm-mb-65">
+                <a rel="nofollow" href="mailto:harshithasridhar172000@gmail.com" class="tm-social-link">
+                    <i class="fa fa-envelope tm-social-icon"></i>
+                </a>
+                <a href="https://twitter.com/Harshit49678822" class="tm-social-link">
+                    <i class="fab fa-twitter tm-social-icon"></i>
+                </a>
+                <a href="https://github.com/Harshitha172000" class="tm-social-link">
+                    <i class="fab fa-github tm-social-icon"></i>
+                </a>
+                <a href="https://linkedin.com/in/harshitha-s-" class="tm-social-link">
+                    <i class="fab fa-linkedin tm-social-icon"></i>
+                </a>
+            </div>
+           
+        </div>
+    </header>
+    <div class="container-fluid">
+        <main class="tm-main">
+            <!-- Search form 
+            <div class="row tm-row">
+                <div class="col-12">
+                    <form method="GET" class="form-inline tm-mb-80 tm-search-form">                
+                        <input class="form-control tm-search-input" name="query" type="text" placeholder="Search..." aria-label="Search">
+                        <button class="tm-search-button" type="submit">
+                            <i class="fas fa-search tm-search-icon" aria-hidden="true"></i>
+                        </button>                                
+                    </form>
+                </div>                
+            </div> -->   
+                             
+
+            <div class="row tm-row tm-mb-40">
+                <div class="col-12">                                                       
+                        <div class="mb-4">
+                            <h1 class="pt-2 tm-mb-40 tm-color-primary tm-post-title"><strong> Google Summer of Code (GSoC) 2021 -- Project Outline </strong></h1>                       
+                            <p class="tm-mb-40">August 16, 2021 </p>
+<p><img src="img/mor1kx_formal.jpg" alt="Image" class="img-fluid"></p>
+<br>
+<h2 id="abstract"><strong>Abstract</strong></h2>
+<p>OpenRISC’s mor1kx is one of the old open source projects with more sophisticated and multi-core features. FuseSoC support for mor1kx makes it unique, enabling users to run their assembly programs in a virtual SoC. The or1k-elf toolchain compiles assembly programs, simulated using Icarus Verilog to visualize waveforms. Mor1kx processor went through several tests to verify its functionality, and the or1k-tests successfully identified many unseen bugs in the design.</p>
+<p>But we can’t guarantee that the processor is error-free. Formal Verification identifies the hidden bugs in the design. This verification methodology gives confidence that the system remains stable for a long time. Hence in this project, the mor1kx processor is thoroughly tested using Formal Methods, ensuring that implementation meets its specifications.</p>
+<br>
+<p><h2 id="project-deliverables-"><strong>Project Deliverables</strong></h2></p>
+<ol>
+<li><p>Added assertions to all the submodules of the Mor1kx processor.</p>
+</li>
+<li><p>Integrate verified functional modules for hierarchical Formal Verification.</p>
+</li>
+<li><p>CPU level verification of entire mor1kx cappuccino pipeline.</p>
+</li>
+<li><p>Create a Formal Interface to verify all the properties related to SPR.</p>
+</li>
+<li><p>Verify mor1kx’s Instruction and Data Wishbone Bus.</p>
+</li>
+<li><p>Continuous Integration of Formal Tests to GitHub actions workflow.</p>
+</li>
+</ol>
+<br>
+<h2 id="pull-requests-"><strong>Pull Requests</strong></h2>
+<ol>
+<li><p><a href="https://github.com/openrisc/mor1kx/pull/120/commits/7fc989ff6370bb0a6bb148b4ef86c9c7c91e23b4">Formal Verification of Cappuccino</a></p>
+</li>
+<li><p><a href="https://github.com/openrisc/mor1kx/pull/128/commits/160a2e934e53eb0156af7615512600009680295a">Formal Checks CI</a></p>
+</li>
+<li><p><a href="https://github.com/openrisc/mor1kx/pull/130/commits/30632bf6b1f4c7143a3c4201634411a52d5edbf1">Formal: Spr Interface</a></p>
+</li>
+<li><p><a href="https://github.com/openrisc/mor1kx/pull/133/commits/6ced2f635f0adebf273d1190ed91a9e3727693fd">Formal: Wishbone Interface</a></p>
+</li>
+<li><p><a href="https://github.com/openrisc/mor1kx/pull/132/commits/39e54a07f4d9076d0f61a54db6486acf9224f6db">Formal: Update ALU Multi clock Interface</a></p>
+</li>
+</ol>
+<br>
+<h2 id="bugs-found-"><strong>Bugs Found</strong></h2>
+<ol>
+<li><p>one-hot of SPR acknowledgments fail <a href="https://github.com/openrisc/mor1kx/issues/137">#137</a></p>
+</li>
+<li><p>spr_ack is high when there are no mtspr/mfspr instructions <a href="https://github.com/openrisc/mor1kx/issues/136">#136</a></p>
+</li>
+<li><p>SPR property fails when debug unit is enabled <a href="https://github.com/openrisc/mor1kx/issues/135">#135</a></p>
+</li>
+<li><p>Databus Wishbone Interface Formal Check fails <a href="https://github.com/openrisc/mor1kx/issues/134">#134</a></p>
+</li>
+<li><p>Erroneous ICache hits impact performance counters <a href="https://github.com/openrisc/mor1kx/issues/123">#123</a></p>
+</li>
+<li><p>spr_bus_ack_o reset issue <a href="https://github.com/openrisc/mor1kx/issues/127">#127</a> <span style="color:green">(RESOLVED)</span></p>
+</li>
+<li><p>A broken path between dc_hit and dc_hit_o <span style="color:green">(RESOLVED)</span></p>
+</li>
+<li><p>For the same spr address both DMMU and DCACHE spr acknowledgment were observed. <span style="color:green">(RESOLVED)</span></p>
+</li>
+<li><p>DCACHE acknowledged to spr read requests when it’s allowed only for spr write. <span style="color:green">(RESOLVED)</span></p>
+</li>
+</ol>
+<br>
+<h2 id="project-documentation-mor1kx-formal-https-docs-google-com-document-d-133l5irydtm6n2y7fsc4wh6tmsfdy31-v2vzv0rhw-vg-edit-usp-sharing-"><strong>Project Documentation: <a href="https://docs.google.com/document/d/133L5IRYdTm6N2y7fsC4WH6tmsFDY31-V2VZv0RhW-vg/edit?usp=sharing">Mor1kx Formal</a></strong></h2>
+<br>
+<h2 id="what-did-i-learn-"><strong>What did I learn?</strong></h2>
+<ol>
+<li><p>I got exposure to the Verilog coding styles of experts and understood computer architecture in more depth.</p>
+</li>
+<li><p>Learned to write assembly programs that run on the mor1kx processor. Explored many GTK Wave features to visualize waveforms.</p>
+</li>
+<li><p>I played with solvers to resolve Induction/BMC failures which occur most often while testing. Every failure pointed out mistakes I made in an assertion. I fixed the failures after investigating where my assertion went wrong.</p>
+</li>
+<li><p>My favorite part was handling Induction failure because it made me think more, and it’s somewhat challenging in a few cases.</p>
+</li>
+<li><p>I learned about Continuous Integration while creating one for Formal Verification.</p>
+</li>
+</ol>
+<br>
+<h2 id="acknowledgment"><strong>Acknowledgment</strong></h2>
+<p>I am grateful to my mentor Stafford Horne who was there to help me whenever I was stuck. It has been a fantastic experience working with him. Special thanks to Dan (ZipCPU); his blog feedback helped me dig Formal Verification to a great extent.</p>
+<p>I am looking forward to contributing even more to OpenRISC and the open-source community!</p>
+
+
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+            <footer class="row tm-row">
+            </footer> 
+        </main>
+    </div>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/templatemo-script.js"></script>
+</body>
+</html>
